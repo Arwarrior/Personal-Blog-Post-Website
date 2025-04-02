@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Post Detail - Tech Tales by Aryan</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <h1 class="logo">
+        <a href="/" class="logo-link">Tech Tales by Aryan</a>
+      </h1>
+      <nav>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/projects">Projects</a></li>
+          <li><a href="/reviews">Reviews</a></li>
+          <li><a href="/submit">Submit Blog</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="post-content" class="post-detail"></main>
+
+  <!-- Comments -->
+  <section class="comments-section">
+    <h3>Comments</h3>
+    <div id="commentsContainer"></div>
+    <form id="commentForm">
+      <input type="text" id="commentName" placeholder="Your Name" required />
+      <textarea id="commentText" placeholder="Your Comment" rows="3" required></textarea>
+      <button type="submit">Post Comment</button>
+    </form>
+  </section>
+
+  <!-- Chatbot Widget -->
+  <div id="chatWidget" class="chat-widget">
+    <div class="chat-header">Chat with us <i id="chatToggle" class="fas fa-comments"></i></div>
+    <div class="chat-body">
+      <div id="chatMessages"></div>
+      <input type="text" id="chatInput" placeholder="Type your message..." />
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="social">
+      <a href="https://instagram.com" target="_blank"><i class="fab fa-instagram"></i></a>
+      <a href="https://twitter.com" target="_blank"><i class="fab fa-twitter"></i></a>
+      <a href="https://linkedin.com" target="_blank"><i class="fab fa-linkedin"></i></a>
+      <a href="https://github.com" target="_blank"><i class="fab fa-github"></i></a>
+    </div>
+    <p>© 2025 Aryan. All Rights Reserved.</p>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script>
+    // Animate on load
+    gsap.from("header", { y: -50, opacity: 0, duration: 1 });
+    gsap.from(".post-detail", { opacity: 0, duration: 1, delay: 0.5 });
+    gsap.from(".comments-section", { opacity: 0, duration: 1, delay: 1 });
+    gsap.from("footer", { y: 50, opacity: 0, duration: 1, delay: 1.5 });
+
+    // Load the post by ID
+    const pathParts = window.location.pathname.split('/');
+    const postId = pathParts[pathParts.length - 1];
+
+    fetch(`/api/posts/${postId}`)
+      .then(res => res.json())
+      .then(post => {
+        const postContent = document.getElementById('post-content');
+        if (post.message) {
+          postContent.innerHTML = "<p>Post not found.</p>";
+        } else {
+          postContent.innerHTML = `
+            <h2>${post.title}</h2>
+            <p class="date">${post.date}</p>
+            <p class="category">${post.category.replace('-', ' ')}</p>
+            ${ post.image ? `<img src="${post.image}" alt="Post Image" class="post-image" />` : '' }
+            <div class="content">${post.content}</div>
+          `;
+        }
+      })
+      .catch(err => console.error(err));
+
+    // Comments
+    const commentsContainer = document.getElementById('commentsContainer');
+    const commentForm = document.getElementById('commentForm');
+
+    function loadComments() {
+      fetch(`/api/comments/${postId}`)
+        .then(res => res.json())
+        .then(comments => {
+          commentsContainer.innerHTML = '';
+          comments.forEach(c => {
+            const commentDiv = document.createElement('div');
+            commentDiv.className = 'comment';
+            commentDiv.innerHTML = `<strong>${c.name}</strong> <em>${c.date}</em><p>${c.comment}</p>`;
+            commentsContainer.appendChild(commentDiv);
+          });
+        });
+    }
+    loadComments();
+
+    commentForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('commentName').value;
+      const comment = document.getElementById('commentText').value;
+      fetch(`/api/comments/${postId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, comment })
+      })
+      .then(res => res.json())
+      .then(() => {
+        commentForm.reset();
+        loadComments();
+      });
+    });
+
+    // Simple Chatbot
+    const chatWidget = document.getElementById('chatWidget');
+    const chatToggle = document.getElementById('chatToggle');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+
+    let chatStage = 0;
+    const suggestions = [
+      "What are your business hours?",
+      "How can I submit a blog?",
+      "Where can I learn more about AI?",
+      "Any recommended resources?",
+      "Feel free to ask anything now!"
+    ];
+
+    chatToggle.addEventListener('click', () => {
+      chatWidget.classList.toggle('open');
+      if (chatStage === 0) {
+        showBotMessage("Hello! How can I help you today?");
+        showBotMessage(`Try asking: "${suggestions[chatStage]}"`);
+      }
+    });
+
+    chatInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && chatInput.value.trim()) {
+        const userMsg = document.createElement('div');
+        userMsg.className = 'chat-message user';
+        userMsg.innerText = chatInput.value;
+        chatMessages.appendChild(userMsg);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        handleUserMessage(chatInput.value);
+        chatInput.value = '';
+      }
+    });
+
+    function handleUserMessage(message) {
+      setTimeout(() => {
+        if (chatStage < suggestions.length) {
+          showBotMessage(`You asked: "${message}". Perhaps you'd like to know: "${suggestions[chatStage]}"`);
+          chatStage++;
+        } else {
+          showBotMessage("Thanks for your query! We'll get back to you soon.");
+        }
+      }, 700);
+    }
+
+    function showBotMessage(text) {
+      const botMsg = document.createElement('div');
+      botMsg.className = 'chat-message bot';
+      botMsg.innerHTML = text;
+      chatMessages.appendChild(botMsg);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Submit Blog - Tech Tales by Aryan</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <h1 class="logo">
+        <a href="/" class="logo-link">Tech Tales by Aryan</a>
+      </h1>
+      <nav>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/projects">Projects</a></li>
+          <li><a href="/reviews">Reviews</a></li>
+          <li><a href="/submit">Submit Blog</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-content">
+    <h2>Submit Your Blog Post</h2>
+    <p>
+      Have valuable insights or experiences to share with our tech community? Fill out the form below to submit your blog post. Once submitted, you’ll receive a verification link via email. After verification, your post will be published and visible to all our readers.
+    </p>
+    <form id="submitForm" method="POST" action="/api/submit" enctype="multipart/form-data" class="submit-blog-form">
+      <label for="name">Your Name</label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="email">Your Email</label>
+      <input type="email" id="email" name="email" required>
+
+      <label for="title">Blog Title</label>
+      <input type="text" id="title" name="title" required>
+
+      <label for="category">Category</label>
+      <select id="category" name="category" required>
+        <option value="data-science">Data Science</option>
+        <option value="cyber-security">Cyber Security</option>
+        <option value="cloud-computing">Cloud Computing</option>
+        <option value="regression">Regression</option>
+        <option value="artificial-intelligence">Artificial Intelligence</option>
+        <option value="machine-learning">Machine Learning</option>
+      </select>
+
+      <label for="description">Short Description</label>
+      <textarea id="description" name="description" rows="3" required></textarea>
+
+      <label for="content">Full Content</label>
+      <textarea id="content" name="content" rows="10" required></textarea>
+
+      <label for="image">Upload an Image</label>
+      <input type="file" id="image" name="image" accept="image/*">
+
+      <button type="submit">Submit Post</button>
+    </form>
+    <div id="submitMessage" class="submit-message"></div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="social">
+      <a href="https://instagram.com" target="_blank"><i class="fab fa-instagram"></i></a>
+      <a href="https://twitter.com" target="_blank"><i class="fab fa-twitter"></i></a>
+      <a href="https://linkedin.com" target="_blank"><i class="fab fa-linkedin"></i></a>
+      <a href="https://github.com" target="_blank"><i class="fab fa-github"></i></a>
+    </div>
+    <p>© 2025 Aryan. All Rights Reserved.</p>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script>
+    // Animations
+    gsap.from("header", { y: -50, opacity: 0, duration: 1 });
+    gsap.from(".page-content", { opacity: 0, duration: 1, delay: 0.5 });
+    gsap.from("footer", { y: 50, opacity: 0, duration: 1, delay: 1 });
+
+    // Submit Blog
+    document.getElementById('submitForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      fetch('/api/submit', {
+        method: 'POST',
+        body: formData
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('submitMessage').innerText = data.message;
+        document.getElementById('submitForm').reset();
+      })
+      .catch(err => {
+        document.getElementById('submitMessage').innerText = "An error occurred. Please try again.";
+        console.error(err);
+      });
+    });
+  </script>
+</body>
+</html>

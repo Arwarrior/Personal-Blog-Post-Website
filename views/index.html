@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tech Tales by Aryan</title>
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-container">
+      <h1 class="logo">
+        <a href="/" class="logo-link">Tech Tales by Aryan</a>
+      </h1>
+      <nav>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/projects">Projects</a></li>
+          <li><a href="/reviews">Reviews</a></li>
+          <li><a href="/submit">Submit Blog</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Search & Categories -->
+  <section class="controls">
+    <input type="text" id="searchBar" placeholder="Search posts..." />
+    <div class="categories">
+      <button data-category="all">All</button>
+      <button data-category="data-science">Data Science</button>
+      <button data-category="cyber-security">Cyber Security</button>
+      <button data-category="cloud-computing">Cloud Computing</button>
+      <button data-category="regression">Regression</button>
+      <button data-category="artificial-intelligence">AI</button>
+      <button data-category="machine-learning">Machine Learning</button>
+    </div>
+  </section>
+
+  <!-- Posts -->
+  <section id="posts"></section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="social">
+      <a href="https://instagram.com" target="_blank"><i class="fab fa-instagram"></i></a>
+      <a href="https://twitter.com" target="_blank"><i class="fab fa-twitter"></i></a>
+      <a href="https://linkedin.com" target="_blank"><i class="fab fa-linkedin"></i></a>
+      <a href="https://github.com" target="_blank"><i class="fab fa-github"></i></a>
+    </div>
+    <p>© 2025 Aryan. All Rights Reserved.</p>
+  </footer>
+
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="/script.js"></script>
+  <script>
+    // Animate the header, controls, and posts on load
+    gsap.from("header", { y: -50, opacity: 0, duration: 1 });
+    gsap.from(".controls", { opacity: 0, duration: 1, delay: 0.5 });
+    gsap.from("#posts", { opacity: 0, duration: 1, delay: 1 });
+    gsap.from("footer", { y: 50, opacity: 0, duration: 1, delay: 1.5 });
+  </script>
+</body>
+</html>

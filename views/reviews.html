@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Reviews - Tech Tales by Aryan</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <h1 class="logo">
+        <a href="/" class="logo-link">Tech Tales by Aryan</a>
+      </h1>
+      <nav>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/projects">Projects</a></li>
+          <li><a href="/reviews">Reviews</a></li>
+          <li><a href="/submit">Submit Blog</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-content">
+    <h2>User Reviews & Forum</h2>
+    <p>
+      Share your thoughts, feedback, and experiences about Tech Tales by Aryan. We value your input and believe that community-driven discussions help us improve and innovate. Feel free to submit your review using the form below. Your feedback will appear for everyone to see!
+    </p>
+
+    <!-- Review Form -->
+    <form id="reviewForm" class="review-form">
+      <label for="reviewName">Your Name</label>
+      <input type="text" id="reviewName" placeholder="Enter your name" required />
+
+      <label for="reviewMessage">Your Review</label>
+      <textarea id="reviewMessage" rows="4" placeholder="Share your experience or feedback..." required></textarea>
+
+      <button type="submit">Submit Review</button>
+    </form>
+
+    <!-- Reviews Display -->
+    <div id="reviewsContainer" class="reviews-container"></div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="social">
+      <a href="https://instagram.com" target="_blank"><i class="fab fa-instagram"></i></a>
+      <a href="https://twitter.com" target="_blank"><i class="fab fa-twitter"></i></a>
+      <a href="https://linkedin.com" target="_blank"><i class="fab fa-linkedin"></i></a>
+      <a href="https://github.com" target="_blank"><i class="fab fa-github"></i></a>
+    </div>
+    <p>© 2025 Aryan. All Rights Reserved.</p>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script>
+    // Animations
+    gsap.from("header", { y: -50, opacity: 0, duration: 1 });
+    gsap.from(".page-content", { opacity: 0, duration: 1, delay: 0.5 });
+    gsap.from("footer", { y: 50, opacity: 0, duration: 1, delay: 1 });
+
+    // Review Form Handling
+    const reviewForm = document.getElementById('reviewForm');
+    const reviewsContainer = document.getElementById('reviewsContainer');
+
+    // Load existing reviews
+    function loadReviews() {
+      fetch('/api/reviews')
+        .then(res => res.json())
+        .then(data => {
+          reviewsContainer.innerHTML = '';
+          data.forEach(r => {
+            const reviewDiv = document.createElement('div');
+            reviewDiv.className = 'review-card';
+            reviewDiv.innerHTML = `
+              <strong>${r.name}</strong> <em>${r.date}</em>
+              <p>${r.message}</p>
+            `;
+            reviewsContainer.appendChild(reviewDiv);
+          });
+        });
+    }
+    loadReviews();
+
+    // Submit new review
+    reviewForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('reviewName').value;
+      const message = document.getElementById('reviewMessage').value;
+
+      fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, message })
+      })
+      .then(res => res.json())
+      .then(() => {
+        reviewForm.reset();
+        loadReviews();
+      })
+      .catch(err => console.error(err));
+    });
+  </script>
+</body>
+</html>
